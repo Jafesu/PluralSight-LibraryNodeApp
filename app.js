@@ -1,25 +1,13 @@
 const express = require('express');
 const chalk = require('chalk');
-const debug = require('debug')('app:app');
+const debug = require('debug')('app');
 const morgan = require('morgan');
 const path = require('path');
-const sql = require('mssql');
 
 const app = express();
 const port = process.env.PORT || 8081;
 
-const config = {
-  user: 'library',
-  password: 'P@ssw0rd',
-  server: 'jafesu-pslibrary.database.windows.net',
-  database: 'PSLibrary',
 
-  options: {
-    encrypt: true
-  }
-};
-
-sql.connect(config).catch(err => debug(err));
 app.use(morgan('tiny'));
 app.use(express.static(path.join(__dirname, '/public')));
 app.use('/css', express.static(path.join(__dirname, '/node_modules/bootstrap/dist/css')));
@@ -34,9 +22,10 @@ const nav = [
   { link: '/authors', title: 'Author' }
 ];
 const bookRouter = require('./src/routes/bookRoutes')(nav);
+const adminRouter = require('./src/routes/adminRoutes')(nav);
 
 app.use('/books', bookRouter);
-
+app.use('/admin', adminRouter);
 
 app.get('/', (req, res) => {
   res.render(
